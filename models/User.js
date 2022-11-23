@@ -59,7 +59,7 @@ class User {
 		this._name = name;
 	}
 
-	set gender(){
+	set gender(gender){
 		return this._gender;
 	}
 
