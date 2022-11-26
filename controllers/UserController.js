@@ -15,12 +15,14 @@ class UserController {
 			let values = this.getValues();
 			let btnSubmit = this.formEl.querySelector("[type=submit]");
 
+			if (!values) return false;
+
 			btnSubmit.disable = true;
 
 			// Chamando a função getPho de maneira síncrona
 		 	/*	this.getPhoto((content)=>{
 				values.photo = content;
-				this.addLine(values, this.tableId);
+				this.addLine(values, this.tablfeId);
 			}); */		
 
 			//Chamando a função getPhoto de maneira Assícrona
@@ -92,10 +94,17 @@ class UserController {
 
 	getValues(){
 		let user = {};
+		let isValid = true;
 
 		event.preventDefault();
 
 	    [...this.formEl.elements].forEach(function(field, index){
+
+	    	if(['name', 'password', 'email'].indexOf(field.name) > -1 && !field.value){
+
+	    		field.parentElement.classList.add("has-error");
+	    		isValid = false;
+	    	}
 
 	        if (field.name === "gender") {
 
@@ -116,6 +125,9 @@ class UserController {
 
 	    });
 
+	    if (!isValid) 
+    		return false;
+
 	    return new User(user.name, user.gender, user.birth, 
 	                           user.country, user.email, user.password, user.photo, user.admin);
 
@@ -126,6 +138,7 @@ class UserController {
 	    console.log(dataUser);
 
 	    let tr = document.createElement("tr");
+	    tr.dataset.user = JSON.stringify(dataUser);
 
 	    tr.innerHTML = `
 	        <tr>
@@ -142,6 +155,26 @@ class UserController {
 	    `;
 
 	    this.tableId.appendChild(tr);
+	    this.updateCount();
+
+	}
+
+	updateCount() {
+		let numberUser = 0;
+		let numberAdmin = 0;
+
+		[...this.tableId.children].forEach(tr => {
+
+			if (tr.localName == "tr"){
+				let user = JSON.parse(tr.dataset.user);
+				numberUser++;
+				if (user._admin) numberAdmin++;
+			}
+
+		});
+
+		document.getElementById("number-users").innerHTML = numberUser;
+		document.getElementById("number-users-admin").innerHTML = numberAdmin;
 
 	}
 
